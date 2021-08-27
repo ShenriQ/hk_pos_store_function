@@ -4,10 +4,14 @@ const priv_keys = {
 }
 
 
-function createChargeWith(token, amount, id , APP_ID ) {
+function createChargeWith(token, amount, id , APP_ID , PRIV_KEY) {
     return new Promise( function (resolve,reject) {
         let private_key = master_priv_key;
-        if (APP_ID != '') {
+
+        if(APP_ID == '02_') { // 3 shops project
+            private_key = PRIV_KEY;
+        }
+        else if (APP_ID != '') {
             private_key = priv_keys[APP_ID]
         }
 

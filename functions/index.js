@@ -47,6 +47,9 @@ exports.assignAdmin = functions.firestore
 exports.assignAdmin_01 = functions.firestore
     .document("01_Channels/{channelId}")
     .onCreate((snap, context) => assignAdmin.assignAdminHandler(snap, context, '01_'));
+exports.assignAdmin_01 = functions.firestore
+    .document("02_Channels/{channelId}")
+    .onCreate((snap, context) => assignAdmin.assignAdminHandler(snap, context, '02_'));
 
 
 exports.newOrderNotification = functions.firestore
@@ -55,6 +58,9 @@ exports.newOrderNotification = functions.firestore
 exports.newOrderNotification_01 = functions.firestore
     .document("01_Orders/{orderId}")
     .onCreate((snap, context) => listenOrders.create(snap, context, '01_'));
+exports.newOrderNotification_01 = functions.firestore
+    .document("02_Orders/{orderId}")
+    .onCreate((snap, context) => listenOrders.create(snap, context, '02_'));
 
 
 exports.updOrderNotification = functions.firestore
@@ -63,6 +69,9 @@ exports.updOrderNotification = functions.firestore
 exports.updOrderNotification_01 = functions.firestore
     .document("01_Orders/{orderId}")
     .onUpdate((snap, context) => listenOrders.update(snap, context, '01_'));
+exports.updOrderNotification_01 = functions.firestore
+    .document("02_Orders/{orderId}")
+    .onUpdate((snap, context) => listenOrders.update(snap, context, '02_'));
 
 exports.msgCustomerNotification = functions.firestore
     .document("Messages/{msgId}")
@@ -70,6 +79,9 @@ exports.msgCustomerNotification = functions.firestore
 exports.msgCustomerNotification_01 = functions.firestore
     .document("01_Messages/{msgId}")
     .onCreate((snap, context) => listenMsgs.notify(snap, context, '01_'));
+exports.msgCustomerNotification_01 = functions.firestore
+    .document("02_Messages/{msgId}")
+    .onCreate((snap, context) => listenMsgs.notify(snap, context, '02_'));
 
 
 // // App创建订单推送到银豹系统

@@ -14,11 +14,34 @@ exports.createOrderHandler = ((req, res) => {
             // return
         }
 
-        let orderRef = db.collection(APP_ID + 'Orders').doc();
+
         let amount = body.amount;
         let token = body.token;
         let cod = body.cod;
 
+        var MANAGER_ID = body.managerId;
+        var PRIV_KEY = null;
+
+        if (APP_ID == '02_' && cod != true) { // 3 shops project
+            try {
+                let shopinfo_ref = await db.collection(APP_ID + 'ShopInfo').doc(MANAGER_ID).get();
+
+                if (shopinfo_ref.data() != null) {
+                    PRIV_KEY = shopinfo_ref.data().stripe_priv;
+                }
+                else {
+                    res.status(404).send({ success: false, message: "Card payment is temporarily unavailable.", error: error });
+                    return;
+                }
+            }
+            catch (error) {
+                console.log('Error', error);
+                res.status(404).send({ success: false, message: "Card payment is temporarily unavailable.", error: error });
+                return;
+            }
+        }
+
+        let orderRef = db.collection(APP_ID + 'Orders').doc();
         body = replaceDates(body);
         body.id = orderRef.id;
         body.createdAt = admin.firestore.FieldValue.serverTimestamp()
@@ -89,16 +112,16 @@ exports.createOrderHandler = ((req, res) => {
                     //         console.log("out of stock of main product : ", product.title)
                     //         break
                     //     } else {
-                            // let productRef = db.collection(APP_ID + 'Products').doc(product.id);
-                            // let stockUpdate = { stock: (pStock - total_qty).toString() };
-                            // batch.update(productRef, stockUpdate);
+                    // let productRef = db.collection(APP_ID + 'Products').doc(product.id);
+                    // let stockUpdate = { stock: (pStock - total_qty).toString() };
+                    // batch.update(productRef, stockUpdate);
                     //     }
                     //     tmpBackup.push(product.id)
                     // }
 
                     // get all sub products list
                     var subProductIds = [];
-                    cartItemList.forEach(cartitem => { 
+                    cartItemList.forEach(cartitem => {
                         let found = false
                         for (let subp_id = 0; subp_id < subProductIds.length; subp_id++) {
                             if (subProductIds[subp_id].product_id == cartitem.subProduct.id) {
@@ -160,7 +183,7 @@ exports.createOrderHandler = ((req, res) => {
                         return batch.commit()
                     } else {
                         console.log("createChargeWith")
-                        return stripeHelper.createChargeWith(token, amount, body.id, APP_ID);
+                        return stripeHelper.createChargeWith(token, amount, body.id, APP_ID, PRIV_KEY);
                     }
                 }
             }).then(chargeObj => {
@@ -230,7 +253,7 @@ function replaceDates(obj) {
                     p = replaceDates(p);
                     cartItems[i].product = p;
 
-                    var subProduct = cartItems[i].subProduct 
+                    var subProduct = cartItems[i].subProduct
                     cartItems[i].subProduct = replaceDates(subProduct);
                 }
                 obj[property] = cartItems;

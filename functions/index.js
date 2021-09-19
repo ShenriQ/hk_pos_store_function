@@ -47,10 +47,15 @@ exports.assignAdmin = functions.firestore
 exports.assignAdmin_01 = functions.firestore
     .document("01_Channels/{channelId}")
     .onCreate((snap, context) => assignAdmin.assignAdminHandler(snap, context, '01_'));
-exports.assignAdmin_01 = functions.firestore
+exports.assignAdmin_02 = functions.firestore
     .document("02_Channels/{channelId}")
     .onCreate((snap, context) => assignAdmin.assignAdminHandler(snap, context, '02_'));
-
+exports.assignAdmin_03 = functions.firestore
+    .document("03_Channels/{channelId}")
+    .onCreate((snap, context) => assignAdmin.assignAdminHandler(snap, context, '03_'));
+exports.assignAdmin_04 = functions.firestore
+    .document("04_Channels/{channelId}")
+    .onCreate((snap, context) => assignAdmin.assignAdminHandler(snap, context, '04_'));
 
 exports.newOrderNotification = functions.firestore
     .document("Orders/{orderId}")
@@ -58,9 +63,15 @@ exports.newOrderNotification = functions.firestore
 exports.newOrderNotification_01 = functions.firestore
     .document("01_Orders/{orderId}")
     .onCreate((snap, context) => listenOrders.create(snap, context, '01_'));
-exports.newOrderNotification_01 = functions.firestore
+exports.newOrderNotification_02 = functions.firestore
     .document("02_Orders/{orderId}")
     .onCreate((snap, context) => listenOrders.create(snap, context, '02_'));
+exports.newOrderNotification_03 = functions.firestore
+    .document("03_Orders/{orderId}")
+    .onCreate((snap, context) => listenOrders.create(snap, context, '03_'));
+exports.newOrderNotification_04 = functions.firestore
+    .document("04_Orders/{orderId}")
+    .onCreate((snap, context) => listenOrders.create(snap, context, '04_'));
 
 
 exports.updOrderNotification = functions.firestore
@@ -69,9 +80,15 @@ exports.updOrderNotification = functions.firestore
 exports.updOrderNotification_01 = functions.firestore
     .document("01_Orders/{orderId}")
     .onUpdate((snap, context) => listenOrders.update(snap, context, '01_'));
-exports.updOrderNotification_01 = functions.firestore
+exports.updOrderNotification_02 = functions.firestore
     .document("02_Orders/{orderId}")
     .onUpdate((snap, context) => listenOrders.update(snap, context, '02_'));
+exports.updOrderNotification_03 = functions.firestore
+    .document("03_Orders/{orderId}")
+    .onUpdate((snap, context) => listenOrders.update(snap, context, '03_'));
+exports.updOrderNotification_04 = functions.firestore
+    .document("04_Orders/{orderId}")
+    .onUpdate((snap, context) => listenOrders.update(snap, context, '04_'));
 
 exports.msgCustomerNotification = functions.firestore
     .document("Messages/{msgId}")
@@ -79,9 +96,15 @@ exports.msgCustomerNotification = functions.firestore
 exports.msgCustomerNotification_01 = functions.firestore
     .document("01_Messages/{msgId}")
     .onCreate((snap, context) => listenMsgs.notify(snap, context, '01_'));
-exports.msgCustomerNotification_01 = functions.firestore
+exports.msgCustomerNotification_02 = functions.firestore
     .document("02_Messages/{msgId}")
     .onCreate((snap, context) => listenMsgs.notify(snap, context, '02_'));
+exports.msgCustomerNotification_03 = functions.firestore
+    .document("03_Messages/{msgId}")
+    .onCreate((snap, context) => listenMsgs.notify(snap, context, '03_'));
+exports.msgCustomerNotification_04 = functions.firestore
+    .document("04_Messages/{msgId}")
+    .onCreate((snap, context) => listenMsgs.notify(snap, context, '04_'));
 
 
 // // App创建订单推送到银豹系统

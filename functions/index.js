@@ -18,6 +18,7 @@ var serviceAccount = {
 admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
     databaseURL: "https://user-f06f7.firebaseio.com",
+    storageBucket : "user-f06f7.appspot.com" 
 });
 
 //FILES
@@ -73,6 +74,9 @@ exports.newOrderNotification_04 = functions.firestore
     .document("04_Orders/{orderId}")
     .onCreate((snap, context) => listenOrders.create(snap, context, '04_'));
 
+exports.newBookingNotification = functions.firestore
+    .document("Bookings/{bookingId}")
+    .onCreate((snap, context) => listenOrders.create(snap, context, ''));
 
 exports.updOrderNotification = functions.firestore
     .document("Orders/{orderId}")

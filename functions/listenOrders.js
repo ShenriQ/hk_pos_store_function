@@ -73,9 +73,9 @@ function notify(token, orderId, username, products, orderStatus, platform) {
 
     var title = "New Order from " + username;
     if (orderStatus == 1) {
-        title = "Order is now INProgress";
+        title = "Order has been canceled";
     } else if (orderStatus == 2) {
-        title = "Order is now Completed";
+        title = "Order is now completed";
     }
 
     if (platform == "Android") {

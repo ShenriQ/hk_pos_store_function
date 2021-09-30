@@ -123,7 +123,7 @@ function notify(token, orderId, username, products, orderStatus, platform) {
 // send pdf invoice email 
 const handleInvoiceEmail = async (order, orderId, APP_ID) => {
     const username = order.customer.name;
-    const customerEmail = "danevhome01@gmail.com"; // order.customer.email;
+    const customerEmail = order.customer.email;
     const order_no = order.no;
 
     const options = {

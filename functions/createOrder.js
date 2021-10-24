@@ -14,11 +14,12 @@ exports.createOrderHandler = ((req, res) => {
             // return
         }
 
-
-        let amount = body.amount;
-        let token = body.token;
         let cod = body.cod;
-
+        let amount = body.amount;
+        let currency = body.currency;
+        let token = body.token;
+        let customer_id = body.customer_id;
+        
         var MANAGER_ID = body.managerId;
         var PRIV_KEY = null;
 
@@ -183,7 +184,12 @@ exports.createOrderHandler = ((req, res) => {
                         return batch.commit()
                     } else {
                         console.log("createChargeWith")
-                        return stripeHelper.createChargeWith(token, amount, body.id, APP_ID, PRIV_KEY);
+                        if (APP_ID == '02_') {
+                            return stripeHelper.createChargeWithCustomer(customer_id, token, amount, currency, body.id, PRIV_KEY);
+                        }
+                        else {
+                            return stripeHelper.createChargeWith(token, amount, body.id, APP_ID);
+                        }
                     }
                 }
             }).then(chargeObj => {

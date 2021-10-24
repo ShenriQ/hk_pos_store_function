@@ -17,6 +17,7 @@ exports.createBookingHandler = ((req, res) => {
         let bookingRef = db.collection(APP_ID + 'Bookings').doc();
         let amount = body.amount;
         let token = body.token;
+        let customer_id = body.customer_id;
         let cod = body.cod;
 
         body = replaceDates(body);

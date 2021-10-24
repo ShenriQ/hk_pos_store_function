@@ -32,6 +32,7 @@ const deleteServiceCat = require("./deleteServiceCategory.js");
 const sendPush = require("./sendPush.js");
 const sendEmail = require("./sendEmail.js");
 const jointPospal = require("./jointPospal");
+const checkoutApi = require("./checkoutApi.js");
 
 //EXPORTS 
 exports.createOrder = functions.https.onRequest(createOrder.createOrderHandler);
@@ -40,6 +41,7 @@ exports.deleteCategory = functions.https.onRequest(deleteCat.deleteOrderHandler)
 exports.deleteServiceCategory = functions.https.onRequest(deleteServiceCat.deleteServiceCategoryHandler);
 exports.sendPush = functions.https.onRequest(sendPush.sendPushHandler);
 exports.sendEmail = functions.https.onRequest(sendEmail.sendEmailHandler);
+exports.checkoutApi = functions.https.onRequest(checkoutApi.checkoutApiHandler);
 
 
 exports.assignAdmin = functions.firestore

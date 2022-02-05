@@ -39,8 +39,26 @@ exports.checkoutApiHandler = ((req, res) => {
                 return;
             }
         }
+        else if (APP_ID == '05_') {  // lee kitchen
+            try {
+                let shopinfo_ref = await db.collection(APP_ID + 'Contents').doc('Important Notes').get();
 
+                if (shopinfo_ref.data() != null) {
+                    PRIV_KEY = shopinfo_ref.data().stripe_priv;
+                }
+                else {
+                    res.status(404).send({ success: false, message: "Card payment is temporarily unavailable.", error: error });
+                    return;
+                }
+            }
+            catch (error) {
+                console.log('Error', error);
+                res.status(404).send({ success: false, message: "Card payment is temporarily unavailable.", error: error });
+                return;
+            }
+        }
 
+        console.log('PRIV_KEY ', PRIV_KEY)
         try {
             if (API_TYPE == "create_customer") {
                 stripeHelper.createCustomer(body.customer_name || '', APP_ID, PRIV_KEY)
@@ -53,6 +71,7 @@ exports.checkoutApiHandler = ((req, res) => {
                         });
                     })
                     .catch(err => {
+                        console.log('Error', err);
                         res.status(500).send({
                             success: false,
                             data: null,
@@ -72,6 +91,7 @@ exports.checkoutApiHandler = ((req, res) => {
                         });
                     })
                     .catch(err => {
+                        console.log('Error', err);
                         res.status(500).send({
                             success: false,
                             data: null,
@@ -91,6 +111,7 @@ exports.checkoutApiHandler = ((req, res) => {
                         });
                     })
                     .catch(err => {
+                        console.log('Error', err);
                         res.status(500).send({
                             success: false,
                             data: null,
@@ -110,6 +131,7 @@ exports.checkoutApiHandler = ((req, res) => {
                         });
                     })
                     .catch(err => {
+                        console.log('Error', err);
                         res.status(500).send({
                             success: false,
                             data: null,
@@ -128,6 +150,7 @@ exports.checkoutApiHandler = ((req, res) => {
                         });
                     })
                     .catch(err => {
+                        console.log('Error', err);
                         res.status(500).send({
                             success: false,
                             message: 'Delete Card failed!',

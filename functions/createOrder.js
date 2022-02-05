@@ -41,6 +41,24 @@ exports.createOrderHandler = ((req, res) => {
                 return;
             }
         }
+        else if (APP_ID == '05_' && cod != true) { //  lee kitchen project
+            try {
+                let shopinfo_ref = await db.collection(APP_ID + 'Contents').doc('Important Notes').get();
+
+                if (shopinfo_ref.data() != null) {
+                    PRIV_KEY = shopinfo_ref.data().stripe_priv;
+                }
+                else {
+                    res.status(404).send({ success: false, message: "Card payment is temporarily unavailable.", error: error });
+                    return;
+                }
+            }
+            catch (error) {
+                console.log('Error', error);
+                res.status(404).send({ success: false, message: "Card payment is temporarily unavailable.", error: error });
+                return;
+            }
+        }
 
         let orderRef = db.collection(APP_ID + 'Orders').doc();
         body = replaceDates(body);
@@ -186,6 +204,9 @@ exports.createOrderHandler = ((req, res) => {
                         console.log("createChargeWith")
                         if (APP_ID == '02_') {
                             return stripeHelper.createChargeWithCustomer(customer_id, token, amount, currency, body.id, PRIV_KEY);
+                        }
+                        else if (APP_ID == '05_') {
+                            return stripeHelper.createChargeWithCustomer(customer_id, token, amount, 'hkd', body.id, PRIV_KEY);
                         }
                         else {
                             return stripeHelper.createChargeWith(token, amount, body.id, APP_ID);

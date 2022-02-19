@@ -1,6 +1,7 @@
 const admin = require('firebase-admin');
 const db = admin.firestore();
 var nodemailer = require('nodemailer');
+var smtpTransport = require('nodemailer-smtp-transport');
 var pdf = require('html-pdf');
 const path = require('path');
 const os = require('os');
@@ -11,18 +12,30 @@ exports.create = ((snap, context, APP_ID) => {
     const orderId = snap.id;
     const order = snap.data();
 
-    return handleOrder(order, orderId, false, APP_ID).then(res => {
-        return handleInvoiceEmail(order, orderId, APP_ID);
-    });
+    return handleOrder(order, orderId, false, APP_ID)
+        .then(res => {
+        })
+        .catch((err) => {
+            console.log('create order noti error ', err)
+        })
+        .finally(() => {
+            return handleInvoiceEmail(order, orderId, APP_ID);
+        });
 });
 
 exports.update = ((change, context, APP_ID) => {
     console.log('running on update order');
     const orderId = change.after.id;
     const order = change.after.data();
-    return handleOrder(order, orderId, true, APP_ID).then(res => {
-        return handleInvoiceEmail(order, orderId, APP_ID);
-    });
+    return handleOrder(order, orderId, true, APP_ID)
+        .then(res => {
+        })
+        .catch((err) => {
+            console.log('update order noti error ', err)
+        })
+        .finally(() => {
+            return handleInvoiceEmail(order, orderId, APP_ID);
+        });
 });
 
 function handleOrder(order, orderId, update, APP_ID) {
@@ -47,7 +60,11 @@ function handleOrder(order, orderId, update, APP_ID) {
             notifyPromises.push(promise);
         })
         return Promise.all(notifyPromises);
-    });
+    })
+        .catch(err => {
+            console.log('handleOrder noti error ', err);
+            return null;
+        });
 }
 
 function getTokens(admin, sendToCustomers, id, APP_ID) {
@@ -56,6 +73,7 @@ function getTokens(admin, sendToCustomers, id, APP_ID) {
         collection = "Customers";
     }
     collection = APP_ID + collection;
+    console.log('getTokens ' + collection)
     return new Promise(function (resolve, reject) {
         var adminsRef = db.collection(collection);
         if (sendToCustomers == true) {
@@ -126,6 +144,8 @@ const handleInvoiceEmail = async (order, orderId, APP_ID) => {
     const customerEmail = order.customer.email;
     const order_no = order.no;
 
+    console.log('handleInvoiceEmail ' + customerEmail);
+
     const options = {
         "format": 'A4',
         "orientation": "portrait", // "portrait" / "landscape"
@@ -150,17 +170,26 @@ const handleInvoiceEmail = async (order, orderId, APP_ID) => {
         },
         timeout: '100000'
     };
-    var transporter = nodemailer.createTransport({
-        name: 'legacyems.co.za',
-        host: 'mail.legacyems.co.za',
-        auth: {
-            user: 'no-reply@legacyems.co.za',
-            pass: 'A&uftCh*x^aL'
-        },
-        port: 465,
-        secure: true
-    });
+    // var transporter = nodemailer.createTransport({
+    //     name: 'legacyems.co.za',
+    //     host: 'mail.legacyems.co.za',
+    //     auth: {
+    //         user: 'no-reply@legacyems.co.za',
+    //         pass: 'A&uftCh*x^aL'
+    //     },
+    //     port: 465,
+    //     secure: true
+    // });
 
+    let transporter = nodemailer.createTransport({
+        host: 'smtp.gmail.com',
+        port: 587,
+        auth: {
+            user: 'chungsing0117@gmail.com',
+            pass: '2022dev!*@!'
+        },
+    });
+ 
     try {
         let order_html = getOrderHtml(order, APP_ID);
         let pdf_name = `${order_no}.pdf`;
@@ -206,14 +235,14 @@ const handleInvoiceEmail = async (order, orderId, APP_ID) => {
 
         transporter.sendMail(mailOptions, function (error, info) {
             if (error) {
-                console.log(error);
+                console.log('Email error : ', error);
             } else {
                 console.log('Email sent: ' + info.response);
             }
         });
     }
     catch (error) {
-        console.log(error)
+        console.log("pdf error ", error);
     }
 }
 
@@ -243,7 +272,7 @@ function getLogoImg(APP_ID) {
         logo = "https://firebasestorage.googleapis.com/v0/b/user-f06f7.appspot.com/o/logos%2Fenagic.png?alt=media&token=bb80b080-f835-484d-8c4a-0540d35de2d5"
     }
     else if (APP_ID == "04_") { // enagic
-        logo = "https://firebasestorage.googleapis.com/v0/b/user-f06f7.appspot.com/o/logos%2Fclone04.png?alt=media&token=82111d66-e5f1-4511-9076-cd8f123c9e8d"
+        logo = "https://firebasestorage.googleapis.com/v0/b/user-f06f7.appspot.com/o/logos%2Fleekitchen.png?alt=media&token=52161fe0-e351-41ea-9252-981e213b1c58"
     }
     return logo;
 }

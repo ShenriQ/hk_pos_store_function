@@ -19,7 +19,7 @@ exports.createOrderHandler = ((req, res) => {
         let currency = body.currency;
         let token = body.token;
         let customer_id = body.customer_id;
-        
+
         var MANAGER_ID = body.managerId;
         var PRIV_KEY = null;
 
@@ -87,10 +87,22 @@ exports.createOrderHandler = ((req, res) => {
 
         const cartItems = body.products == null ? [] : body.products;
         var getProducts = [];
-        cartItems.forEach(item => {
-            const req = db.collection(APP_ID + 'Products').doc(item.product.id).get();
+
+        if (APP_ID == '05_' && body.ifpackage == true) { // leekitchen package product
+            if (body.packageItem == null || body.packageItem.mainProduct == null) {
+                res.status(400).send({ success: false, message: "Invalid Order request", error: error });
+                return
+            }
+            console.log('05--- package order ')
+            const req = db.collection(APP_ID + 'Products').doc(body.packageItem.mainProduct.id).get();
             getProducts.push(req);
-        });
+        }
+        else {
+            cartItems.forEach(item => {
+                const req = db.collection(APP_ID + 'Products').doc(item.product.id).get();
+                getProducts.push(req);
+            });
+        }
 
         let batch = db.batch();
         Promise.all(getProducts)
@@ -111,50 +123,38 @@ exports.createOrderHandler = ((req, res) => {
                         return "sent_res"
                     }
 
-                    // check out of stock
-                    const cartItemList = cartItems.filter(item => {
-                        return product.id === item.product.id
-                    });
-
-                    // let tmpFilterdBackup = tmpBackup.filter(item => { return product.id == item })
-                    // if (tmpFilterdBackup.length == 0) {
-
-                    //     let total_qty = 0
-                    //     cartItemList.forEach(cartitem => {
-                    //         total_qty = total_qty + parseInt(cartitem.quantity);
-                    //     });
-
-                    //     let pStock = parseInt(product.stock);
-                    //     if (pStock - total_qty < 0) { // this product is out of stock
-                    //         outOfStock = product
-
-                    //         console.log("out of stock of main product : ", product.title)
-                    //         break
-                    //     } else {
-                    // let productRef = db.collection(APP_ID + 'Products').doc(product.id);
-                    // let stockUpdate = { stock: (pStock - total_qty).toString() };
-                    // batch.update(productRef, stockUpdate);
-                    //     }
-                    //     tmpBackup.push(product.id)
-                    // }
-
                     // get all sub products list
                     var subProductIds = [];
-                    cartItemList.forEach(cartitem => {
-                        let found = false
-                        for (let subp_id = 0; subp_id < subProductIds.length; subp_id++) {
-                            if (subProductIds[subp_id].product_id == cartitem.subProduct.id) {
-                                found = true
-                                subProductIds[subp_id].cnt = subProductIds[subp_id].cnt + cartitem.quantity
+
+                    if (APP_ID == '05_' && body.ifpackage == true) {
+                        subProductIds.push({
+                            product_id: body.packageItem.subP_Id,
+                            cnt: body.packageItem.packageNum
+                        })
+                    }
+                    else {
+                        // check out of stock
+                        const cartItemList = cartItems.filter(item => {
+                            return product.id === item.product.id
+                        });
+
+                        cartItemList.forEach(cartitem => {
+                            let found = false
+                            for (let subp_id = 0; subp_id < subProductIds.length; subp_id++) {
+                                if (subProductIds[subp_id].product_id == cartitem.subProduct.id) {
+                                    found = true
+                                    subProductIds[subp_id].cnt = subProductIds[subp_id].cnt + cartitem.quantity
+                                }
                             }
-                        }
-                        if (found == false) {
-                            subProductIds.push({
-                                product_id: cartitem.subProduct.id,
-                                cnt: cartitem.quantity
-                            })
-                        }
-                    });
+                            if (found == false) {
+                                subProductIds.push({
+                                    product_id: cartitem.subProduct.id,
+                                    cnt: cartitem.quantity
+                                })
+                            }
+                        });
+                    }
+
 
                     console.log("subProductIds", subProductIds)
 
@@ -271,6 +271,15 @@ function replaceDates(obj) {
                 obj[property] = replaceDates(obj[property]);
             }
             if (property == "coupon") {
+                obj[property] = replaceDates(obj[property]);
+            }
+            if (property == "packageItem") {
+                obj[property] = replaceDates(obj[property]);
+            }
+            if (property == "service") {
+                obj[property] = replaceDates(obj[property]);
+            }
+            if (property == "mainProduct") {
                 obj[property] = replaceDates(obj[property]);
             }
             if (property == "products") {

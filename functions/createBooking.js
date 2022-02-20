@@ -20,6 +20,31 @@ exports.createBookingHandler = ((req, res) => {
         let customer_id = body.customer_id;
         let cod = body.cod;
 
+        if (APP_ID == '05_' && body.ifpackage == true && body.orderMethod == "package") {
+            cod = true;
+        }
+
+        var PRIV_KEY = null;
+
+        if (APP_ID == '05_' && cod != true) { //  lee kitchen project
+            try {
+                let shopinfo_ref = await db.collection(APP_ID + 'Contents').doc('Important Notes').get();
+
+                if (shopinfo_ref.data() != null) {
+                    PRIV_KEY = shopinfo_ref.data().stripe_priv;
+                }
+                else {
+                    res.status(404).send({ success: false, message: "Card payment is temporarily unavailable.", error: error });
+                    return;
+                }
+            }
+            catch (error) {
+                console.log('Error', error);
+                res.status(404).send({ success: false, message: "Card payment is temporarily unavailable.", error: error });
+                return;
+            }
+        }
+
         body = replaceDates(body);
         body.id = bookingRef.id;
         body.createdAt = admin.firestore.FieldValue.serverTimestamp()
@@ -72,7 +97,7 @@ exports.createBookingHandler = ((req, res) => {
                         console.log("Some of the service dates is null")
                         res.status(404).send({
                             success: false,
-                            message: "請選擇另一個日期，因為該日期已過期或已滿。",
+                            message: "請選擇另一個日期, 因為該日期已過期或已滿。",
                             messageEng: "Some of the service dates from your booking are not available."
                         });
                         return "sent_res"
@@ -117,23 +142,28 @@ exports.createBookingHandler = ((req, res) => {
                                                     return "sent_res"
                                                 }
                                                 else { // update used count
-                                                    let serviceDateRef = db.collection(APP_ID + 'Services').doc(booking_item.booking_service.id)
-                                                    .collection('Dates').doc(serviceDate.id)
+                                                    if (APP_ID == '05_' && body.ifpackage == true) {
 
-                                                    if (booking_item.booking_service.everyday == true) {
-                                                        serviceDateRef = db.collection(APP_ID + 'Services').doc(booking_item.booking_service.id)
-                                                                                                            .collection('everyday').doc('everyday')
                                                     }
-                                                    // copy
-                                                    let newUpdateTimeSlots = serviceDate.timeslots.slice(0, serviceDate.timeslots.length)
-                                                    for(var u_i = 0; u_i < newUpdateTimeSlots.length; u_i ++) {
-                                                        if(newUpdateTimeSlots[u_i].id == found_item.id) {
-                                                            newUpdateTimeSlots[u_i].used_cnt = newUpdateTimeSlots[u_i].used_cnt + 1
+                                                    else {
+                                                        let serviceDateRef = db.collection(APP_ID + 'Services').doc(booking_item.booking_service.id)
+                                                        .collection('Dates').doc(serviceDate.id)
+    
+                                                        if (booking_item.booking_service.everyday == true) {
+                                                            serviceDateRef = db.collection(APP_ID + 'Services').doc(booking_item.booking_service.id)
+                                                                                                                .collection('everyday').doc('everyday')
                                                         }
+                                                        // copy
+                                                        let newUpdateTimeSlots = serviceDate.timeslots.slice(0, serviceDate.timeslots.length)
+                                                        for(var u_i = 0; u_i < newUpdateTimeSlots.length; u_i ++) {
+                                                            if(newUpdateTimeSlots[u_i].id == found_item.id) {
+                                                                newUpdateTimeSlots[u_i].used_cnt = newUpdateTimeSlots[u_i].used_cnt + 1
+                                                            }
+                                                        }
+                                                       
+                                                        let timeslotsUpdate = { timeslots: newUpdateTimeSlots};
+                                                        batch.update(serviceDateRef, timeslotsUpdate);
                                                     }
-                                                   
-                                                    let timeslotsUpdate = { timeslots: newUpdateTimeSlots};
-                                                    batch.update(serviceDateRef, timeslotsUpdate);
                                                 }
                                             })
                                         }
@@ -151,7 +181,12 @@ exports.createBookingHandler = ((req, res) => {
                     return batch.commit()
                 } else {
                     console.log("createChargeWith")
-                    return stripeHelper.createChargeWith(token, amount, body.id, APP_ID);
+                    if (APP_ID == '05_') {
+                        return stripeHelper.createChargeWithCustomer(customer_id, token, amount, 'hkd', body.id, PRIV_KEY);
+                    }
+                    else {
+                        return stripeHelper.createChargeWith(token, amount, body.id, APP_ID);
+                    }
                 }
 
             }).then(chargeObj => {
@@ -212,6 +247,15 @@ function replaceDates(obj) {
                 obj[property] = replaceDates(obj[property]);
             }
             if (property == "coupon") {
+                obj[property] = replaceDates(obj[property]);
+            }
+            if (property == "packageItem") {
+                obj[property] = replaceDates(obj[property]);
+            }
+            if (property == "service") {
+                obj[property] = replaceDates(obj[property]);
+            }
+            if (property == "mainProduct") {
                 obj[property] = replaceDates(obj[property]);
             }
             if (property == "products") {

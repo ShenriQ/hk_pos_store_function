@@ -20,7 +20,7 @@ exports.createBookingHandler = ((req, res) => {
         let customer_id = body.customer_id;
         let cod = body.cod;
 
-        if (APP_ID == '05_' && body.ifpackage == true && body.orderMethod == "package") {
+        if (APP_ID == '05_' && body.orderMethod == "package") {
             cod = true;
         }
 

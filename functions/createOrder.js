@@ -89,13 +89,15 @@ exports.createOrderHandler = ((req, res) => {
         var getProducts = [];
 
         if (APP_ID == '05_' && body.ifpackage == true) { // leekitchen package product
-            if (body.packageItem == null || body.packageItem.mainProduct == null) {
+            if (body.packageItem == null || ( body.packageItem.ifService != true && body.packageItem.mainProduct == null)) {
                 res.status(400).send({ success: false, message: "Invalid Order request", error: error });
                 return
             }
             console.log('05--- package order ')
-            const req = db.collection(APP_ID + 'Products').doc(body.packageItem.mainProduct.id).get();
-            getProducts.push(req);
+            if (body.packageItem.ifService != true) {
+                const req = db.collection(APP_ID + 'Products').doc(body.packageItem.mainProduct.id).get();
+                getProducts.push(req);
+            }
         }
         else {
             cartItems.forEach(item => {
@@ -127,10 +129,12 @@ exports.createOrderHandler = ((req, res) => {
                     var subProductIds = [];
 
                     if (APP_ID == '05_' && body.ifpackage == true) {
-                        subProductIds.push({
-                            product_id: body.packageItem.subP_Id,
-                            cnt: body.packageItem.packageNum
-                        })
+                        if (body.packageItem.ifService != true) {
+                            subProductIds.push({
+                                product_id: body.packageItem.subP_Id,
+                                cnt: body.packageItem.packageNum
+                            })
+                        }
                     }
                     else {
                         // check out of stock

@@ -1,4 +1,5 @@
 const admin = require('firebase-admin');
+const moment = require('moment');
 const db = admin.firestore();
 const stripeHelper = require('./stripeHelper.js');
 const cors = require('cors')({ origin: true });
@@ -131,8 +132,12 @@ exports.createBookingHandler = ((req, res) => {
                                             return "sent_res"
                                         }
                                         else {
+                                            let todayString = moment(new Date()).format('YYYY-MM-DD');
                                             found_timeslots.forEach(found_item => {
-                                                if(found_item.used_cnt >= found_item.capacity) {
+                                                if(
+                                                    (booking_item.booking_service.everyday != true && found_item.used_cnt >= found_item.capacity)  ||  
+                                                    (booking_item.booking_service.everyday == true && found_item.used_dates != null && found_item.used_dates.filter(d => d == todayString).length >= timeSlot.capacity)
+                                                ) {
                                                     console.log("Some of the service timeslots is full")
                                                     res.status(404).send({
                                                         success: false,
@@ -157,7 +162,12 @@ exports.createBookingHandler = ((req, res) => {
                                                         let newUpdateTimeSlots = serviceDate.timeslots.slice(0, serviceDate.timeslots.length)
                                                         for(var u_i = 0; u_i < newUpdateTimeSlots.length; u_i ++) {
                                                             if(newUpdateTimeSlots[u_i].id == found_item.id) {
-                                                                newUpdateTimeSlots[u_i].used_cnt = newUpdateTimeSlots[u_i].used_cnt + 1
+                                                                newUpdateTimeSlots[u_i].used_cnt = newUpdateTimeSlots[u_i].used_cnt + 1;
+
+                                                                // add used date
+                                                                let tmpUsedDates = newUpdateTimeSlots[u_i].used_dates || [];
+                                                                tmpUsedDates.push(todayString);
+                                                                newUpdateTimeSlots[u_i].used_dates = tmpUsedDates;
                                                             }
                                                         }
                                                        

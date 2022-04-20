@@ -132,11 +132,10 @@ exports.createBookingHandler = ((req, res) => {
                                             return "sent_res"
                                         }
                                         else {
-                                            let todayString = moment(new Date()).format('YYYY-MM-DD');
                                             found_timeslots.forEach(found_item => {
                                                 if(
                                                     (booking_item.booking_service.everyday != true && found_item.used_cnt >= found_item.capacity)  ||  
-                                                    (booking_item.booking_service.everyday == true && found_item.used_dates != null && found_item.used_dates.filter(d => d == todayString).length >= timeSlot.capacity)
+                                                    (booking_item.booking_service.everyday == true && found_item.used_dates != null && found_item.used_dates.filter(d => d == date_item.name).length >= found_item.capacity)
                                                 ) {
                                                     console.log("Some of the service timeslots is full")
                                                     res.status(404).send({
@@ -166,7 +165,7 @@ exports.createBookingHandler = ((req, res) => {
 
                                                                 // add used date
                                                                 let tmpUsedDates = newUpdateTimeSlots[u_i].used_dates || [];
-                                                                tmpUsedDates.push(todayString);
+                                                                tmpUsedDates.push(date_item.name);
                                                                 newUpdateTimeSlots[u_i].used_dates = tmpUsedDates;
                                                             }
                                                         }

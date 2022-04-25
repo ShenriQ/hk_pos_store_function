@@ -39,7 +39,7 @@ exports.checkoutApiHandler = ((req, res) => {
                 return;
             }
         }
-        else if (APP_ID == '05_') {  // lee kitchen
+        else if (APP_ID == '05_' || APP_ID == '04_') {  // lee kitchen, demo
             try {
                 let shopinfo_ref = await db.collection(APP_ID + 'Contents').doc('Important Notes').get();
 

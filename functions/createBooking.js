@@ -21,13 +21,13 @@ exports.createBookingHandler = ((req, res) => {
         let customer_id = body.customer_id;
         let cod = body.cod;
 
-        if (APP_ID == '05_' && body.orderMethod == "package") {
+        if ((APP_ID == '05_' || APP_ID == '04_') && body.orderMethod == "package") {
             cod = true;
         }
 
         var PRIV_KEY = null;
 
-        if (APP_ID == '05_' && cod != true) { //  lee kitchen project
+        if ((APP_ID == '05_' || APP_ID == '04_') && cod != true) { // demo,  lee kitchen project
             try {
                 let shopinfo_ref = await db.collection(APP_ID + 'Contents').doc('Important Notes').get();
 
@@ -62,7 +62,7 @@ exports.createBookingHandler = ((req, res) => {
                 latest_booking_number: latest_booking_number + 1
             });
             body.order_number = latest_booking_number
-        } 
+        }
         catch (error) {
             console.log('Error', error);
             res.status(404).send({ success: false, message: "Booking creating failed", error: error });
@@ -76,12 +76,12 @@ exports.createBookingHandler = ((req, res) => {
             booking_item.booking_dates.forEach(date_item => {
                 if (booking_item.booking_service.everyday == true) {
                     const req = db.collection(APP_ID + 'Services').doc(booking_item.booking_service.id)
-                                              .collection('everyday').doc('everyday').get();
+                        .collection('everyday').doc('everyday').get();
                     getBookingDates.push(req);
                 }
                 else {
                     const req = db.collection(APP_ID + 'Services').doc(booking_item.booking_service.id)
-                                                  .collection('Dates').doc(date_item.id).get();
+                        .collection('Dates').doc(date_item.id).get();
                     getBookingDates.push(req);
                 }
             })
@@ -112,17 +112,17 @@ exports.createBookingHandler = ((req, res) => {
                         });
                         return "sent_res"
                     }
-                    
+
                     // check availability of service timeslots
                     bookingItems.forEach(booking_item => {
                         booking_item.booking_dates.forEach(date_item => {
-                            if(date_item.id == serviceDate.id) {
-                                if(date_item.timeslots != null){
+                            if (date_item.id == serviceDate.id) {
+                                if (date_item.timeslots != null) {
                                     date_item.timeslots.forEach(timeslot_item => {
                                         const found_timeslots = serviceDate.timeslots.filter(db_timeslot_item => {
                                             return db_timeslot_item.id == timeslot_item.id
                                         });
-                                        if(found_timeslots.length == 0) { // if we can not find the required timeslot from db
+                                        if (found_timeslots.length == 0) { // if we can not find the required timeslot from db
                                             console.log("Some of the service timeslots is empty")
                                             res.status(404).send({
                                                 success: false,
@@ -133,8 +133,8 @@ exports.createBookingHandler = ((req, res) => {
                                         }
                                         else {
                                             found_timeslots.forEach(found_item => {
-                                                if(
-                                                    (booking_item.booking_service.everyday != true && found_item.used_cnt >= found_item.capacity)  ||  
+                                                if (
+                                                    (booking_item.booking_service.everyday != true && found_item.used_cnt >= found_item.capacity) ||
                                                     (booking_item.booking_service.everyday == true && found_item.used_dates != null && found_item.used_dates.filter(d => d == date_item.name).length >= found_item.capacity)
                                                 ) {
                                                     console.log("Some of the service timeslots is full")
@@ -146,21 +146,21 @@ exports.createBookingHandler = ((req, res) => {
                                                     return "sent_res"
                                                 }
                                                 else { // update used count
-                                                    if (APP_ID == '05_' && body.ifpackage == true) {
+                                                    if ((APP_ID == '05_' || APP_ID == '04_') && body.ifpackage == true) {
 
                                                     }
                                                     else {
                                                         let serviceDateRef = db.collection(APP_ID + 'Services').doc(booking_item.booking_service.id)
-                                                        .collection('Dates').doc(serviceDate.id)
-    
+                                                            .collection('Dates').doc(serviceDate.id)
+
                                                         if (booking_item.booking_service.everyday == true) {
                                                             serviceDateRef = db.collection(APP_ID + 'Services').doc(booking_item.booking_service.id)
-                                                                                                                .collection('everyday').doc('everyday')
+                                                                .collection('everyday').doc('everyday')
                                                         }
                                                         // copy
                                                         let newUpdateTimeSlots = serviceDate.timeslots.slice(0, serviceDate.timeslots.length)
-                                                        for(var u_i = 0; u_i < newUpdateTimeSlots.length; u_i ++) {
-                                                            if(newUpdateTimeSlots[u_i].id == found_item.id) {
+                                                        for (var u_i = 0; u_i < newUpdateTimeSlots.length; u_i++) {
+                                                            if (newUpdateTimeSlots[u_i].id == found_item.id) {
                                                                 newUpdateTimeSlots[u_i].used_cnt = newUpdateTimeSlots[u_i].used_cnt + 1;
 
                                                                 // add used date
@@ -169,8 +169,8 @@ exports.createBookingHandler = ((req, res) => {
                                                                 newUpdateTimeSlots[u_i].used_dates = tmpUsedDates;
                                                             }
                                                         }
-                                                       
-                                                        let timeslotsUpdate = { timeslots: newUpdateTimeSlots};
+
+                                                        let timeslotsUpdate = { timeslots: newUpdateTimeSlots };
                                                         batch.update(serviceDateRef, timeslotsUpdate);
                                                     }
                                                 }
@@ -190,7 +190,7 @@ exports.createBookingHandler = ((req, res) => {
                     return batch.commit()
                 } else {
                     console.log("createChargeWith")
-                    if (APP_ID == '05_') {
+                    if ((APP_ID == '05_' || APP_ID == '04_')) {
                         return stripeHelper.createChargeWithCustomer(customer_id, token, amount, 'hkd', body.id, PRIV_KEY);
                     }
                     else {
@@ -273,8 +273,8 @@ function replaceDates(obj) {
                     var p = cartItems[i].product;
                     p = replaceDates(p);
                     cartItems[i].product = p;
-  
-                    var subProduct = cartItems[i].subProduct 
+
+                    var subProduct = cartItems[i].subProduct
                     cartItems[i].subProduct = replaceDates(subProduct);
                 }
                 obj[property] = cartItems;

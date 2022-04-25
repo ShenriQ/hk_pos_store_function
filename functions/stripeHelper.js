@@ -2,7 +2,6 @@ const master_priv_key = 'sk_test_6n4ylRAPx30vP76YzwvIarKN'
 const priv_keys = {
     '01_' : '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',
     '03_' : 'sk_test_8sVc9zknZzKrZv7BKVMyf2CY',
-    '04_' : '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',
 }
 
 function createChargeWith(token, amount, id , APP_ID) {
@@ -52,7 +51,7 @@ function createCustomer(name, APP_ID , PRIV_KEY) {
     return new Promise( function (resolve,reject) {
         let private_key = master_priv_key;
 
-        if(APP_ID == '02_' || APP_ID == '05_') { // 3 shops project
+        if(APP_ID == '02_' || APP_ID == '05_' || APP_ID == '04_') { // 3 shops project
             private_key = PRIV_KEY;
         }
         else if (APP_ID != '') {
@@ -75,7 +74,7 @@ function getCustomer(cus_id, APP_ID , PRIV_KEY) {
     return new Promise( function (resolve,reject) {
         let private_key = master_priv_key;
 
-        if(APP_ID == '02_' || APP_ID == '05_') { // 3 shops project
+        if(APP_ID == '02_' || APP_ID == '05_' || APP_ID == '04_') { // 3 shops project
             private_key = PRIV_KEY;
         }
         else if (APP_ID != '') {
@@ -103,7 +102,7 @@ function addCard(cus_id, card_token, APP_ID , PRIV_KEY) {
     return new Promise( function (resolve,reject) {
         let private_key = master_priv_key;
 
-        if(APP_ID == '02_' || APP_ID == '05_') { // 3 shops project
+        if(APP_ID == '02_' || APP_ID == '05_' || APP_ID == '04_') { // 3 shops project
             private_key = PRIV_KEY;
         }
         else if (APP_ID != '') {
@@ -126,7 +125,7 @@ function deleteCard(cus_id, card_id, APP_ID , PRIV_KEY) {
     return new Promise( function (resolve,reject) {
         let private_key = master_priv_key;
 
-        if(APP_ID == '02_' || APP_ID == '05_') { // 3 shops project
+        if(APP_ID == '02_' || APP_ID == '05_' || APP_ID == '04_') { // 3 shops project
             private_key = PRIV_KEY;
         }
         else if (APP_ID != '') {
@@ -155,7 +154,7 @@ function listCards(cus_id, APP_ID , PRIV_KEY) {
     return new Promise( function (resolve,reject) {
         let private_key = master_priv_key;
 
-        if(APP_ID == '02_' || APP_ID == '05_') { // 3 shops project
+        if(APP_ID == '02_' || APP_ID == '05_' || APP_ID == '04_') { // 3 shops project
             private_key = PRIV_KEY;
         }
         else if (APP_ID != '') {

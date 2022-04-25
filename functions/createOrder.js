@@ -41,7 +41,7 @@ exports.createOrderHandler = ((req, res) => {
                 return;
             }
         }
-        else if (APP_ID == '05_' && cod != true) { //  lee kitchen project
+        else if ((APP_ID == '05_' || APP_ID == '04_') && cod != true) { //  lee kitchen project
             try {
                 let shopinfo_ref = await db.collection(APP_ID + 'Contents').doc('Important Notes').get();
 
@@ -88,7 +88,7 @@ exports.createOrderHandler = ((req, res) => {
         const cartItems = body.products == null ? [] : body.products;
         var getProducts = [];
 
-        if (APP_ID == '05_' && body.ifpackage == true) { // leekitchen package product
+        if ((APP_ID == '05_' || APP_ID == '04_') && body.ifpackage == true) { // leekitchen package product
             if (body.packageItem == null || ( body.packageItem.ifService != true && body.packageItem.mainProduct == null)) {
                 res.status(400).send({ success: false, message: "Invalid Order request", error: error });
                 return
@@ -128,7 +128,7 @@ exports.createOrderHandler = ((req, res) => {
                     // get all sub products list
                     var subProductIds = [];
 
-                    if (APP_ID == '05_' && body.ifpackage == true) {
+                    if ((APP_ID == '05_' || APP_ID == '04_') && body.ifpackage == true) {
                         if (body.packageItem.ifService != true) {
                             subProductIds.push({
                                 product_id: body.packageItem.subP_Id,
@@ -209,7 +209,7 @@ exports.createOrderHandler = ((req, res) => {
                         if (APP_ID == '02_') {
                             return stripeHelper.createChargeWithCustomer(customer_id, token, amount, currency, body.id, PRIV_KEY);
                         }
-                        else if (APP_ID == '05_') {
+                        else if ((APP_ID == '05_' || APP_ID == '04_')) {
                             return stripeHelper.createChargeWithCustomer(customer_id, token, amount, 'hkd', body.id, PRIV_KEY);
                         }
                         else {

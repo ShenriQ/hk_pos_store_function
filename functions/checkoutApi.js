@@ -21,25 +21,7 @@ exports.checkoutApiHandler = ((req, res) => {
         }
 
         var PRIV_KEY = null;
-        if (APP_ID == '02_') { // 3 shops project
-            try {
-                let shopinfo_ref = await db.collection(APP_ID + 'ShopInfo').doc(MANAGER_ID).get();
-
-                if (shopinfo_ref.data() != null) {
-                    PRIV_KEY = shopinfo_ref.data().stripe_priv;
-                }
-                else {
-                    res.status(404).send({ success: false, message: "Card payment is temporarily unavailable.", error: error });
-                    return;
-                }
-            }
-            catch (error) {
-                console.log('Error', error);
-                res.status(404).send({ success: false, message: "Card payment is temporarily unavailable.", error: error });
-                return;
-            }
-        }
-        else if (APP_ID == '05_' || APP_ID == '04_') {  // lee kitchen, demo
+        if (APP_ID == '07_' || APP_ID == '08_') {  // lee kitchen, demo
             try {
                 let shopinfo_ref = await db.collection(APP_ID + 'Contents').doc('Important Notes').get();
 

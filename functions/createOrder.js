@@ -20,28 +20,9 @@ exports.createOrderHandler = ((req, res) => {
         let token = body.token;
         let customer_id = body.customer_id;
 
-        var MANAGER_ID = body.managerId;
         var PRIV_KEY = null;
 
-        if (APP_ID == '02_' && cod != true) { // 3 shops project
-            try {
-                let shopinfo_ref = await db.collection(APP_ID + 'ShopInfo').doc(MANAGER_ID).get();
-
-                if (shopinfo_ref.data() != null) {
-                    PRIV_KEY = shopinfo_ref.data().stripe_priv;
-                }
-                else {
-                    res.status(404).send({ success: false, message: "Card payment is temporarily unavailable.", error: error });
-                    return;
-                }
-            }
-            catch (error) {
-                console.log('Error', error);
-                res.status(404).send({ success: false, message: "Card payment is temporarily unavailable.", error: error });
-                return;
-            }
-        }
-        else if ((APP_ID == '05_' || APP_ID == '04_') && cod != true) { //  lee kitchen project
+        if ((APP_ID == '07_' || APP_ID == '08_') && cod != true) { //  lee kitchen project
             try {
                 let shopinfo_ref = await db.collection(APP_ID + 'Contents').doc('Important Notes').get();
 
@@ -88,7 +69,7 @@ exports.createOrderHandler = ((req, res) => {
         const cartItems = body.products == null ? [] : body.products;
         var getProducts = [];
 
-        if ((APP_ID == '05_' || APP_ID == '04_') && body.ifpackage == true) { // leekitchen package product
+        if ((APP_ID == '07_' || APP_ID == '08_') && body.ifpackage == true) { // leekitchen package product
             if (body.packageItem == null || ( body.packageItem.ifService != true && body.packageItem.mainProduct == null)) {
                 res.status(400).send({ success: false, message: "Invalid Order request", error: error });
                 return
@@ -128,7 +109,7 @@ exports.createOrderHandler = ((req, res) => {
                     // get all sub products list
                     var subProductIds = [];
 
-                    if ((APP_ID == '05_' || APP_ID == '04_') && body.ifpackage == true) {
+                    if ((APP_ID == '07_' || APP_ID == '08_') && body.ifpackage == true) {
                         if (body.packageItem.ifService != true) {
                             subProductIds.push({
                                 product_id: body.packageItem.subP_Id,
@@ -206,10 +187,7 @@ exports.createOrderHandler = ((req, res) => {
                         return batch.commit()
                     } else {
                         console.log("createChargeWith")
-                        if (APP_ID == '02_') {
-                            return stripeHelper.createChargeWithCustomer(customer_id, token, amount, currency, body.id, PRIV_KEY);
-                        }
-                        else if ((APP_ID == '05_' || APP_ID == '04_')) {
+                        if ((APP_ID == '07_' || APP_ID == '08_')) {
                             return stripeHelper.createChargeWithCustomer(customer_id, token, amount, 'hkd', body.id, PRIV_KEY);
                         }
                         else {

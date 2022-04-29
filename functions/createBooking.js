@@ -21,13 +21,13 @@ exports.createBookingHandler = ((req, res) => {
         let customer_id = body.customer_id;
         let cod = body.cod;
 
-        if ((APP_ID == '05_' || APP_ID == '04_') && body.orderMethod == "package") {
+        if ((APP_ID == '07_' || APP_ID == '08_') && body.orderMethod == "package") {
             cod = true;
         }
 
         var PRIV_KEY = null;
 
-        if ((APP_ID == '05_' || APP_ID == '04_') && cod != true) { // demo,  lee kitchen project
+        if ((APP_ID == '07_' || APP_ID == '08_') && cod != true) { // demo,  lee kitchen project
             try {
                 let shopinfo_ref = await db.collection(APP_ID + 'Contents').doc('Important Notes').get();
 
@@ -146,7 +146,7 @@ exports.createBookingHandler = ((req, res) => {
                                                     return "sent_res"
                                                 }
                                                 else { // update used count
-                                                    if ((APP_ID == '05_' || APP_ID == '04_') && body.ifpackage == true) {
+                                                    if ((APP_ID == '07_' || APP_ID == '08_') && body.ifpackage == true) {
 
                                                     }
                                                     else {
@@ -190,7 +190,7 @@ exports.createBookingHandler = ((req, res) => {
                     return batch.commit()
                 } else {
                     console.log("createChargeWith")
-                    if ((APP_ID == '05_' || APP_ID == '04_')) {
+                    if ((APP_ID == '07_' || APP_ID == '08_')) {
                         return stripeHelper.createChargeWithCustomer(customer_id, token, amount, 'hkd', body.id, PRIV_KEY);
                     }
                     else {

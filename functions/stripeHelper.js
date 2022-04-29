@@ -51,7 +51,7 @@ function createCustomer(name, APP_ID , PRIV_KEY) {
     return new Promise( function (resolve,reject) {
         let private_key = master_priv_key;
 
-        if(APP_ID == '02_' || APP_ID == '05_' || APP_ID == '04_') { // 3 shops project
+        if(APP_ID == '07_' || APP_ID == '08_') { // 
             private_key = PRIV_KEY;
         }
         else if (APP_ID != '') {
@@ -74,7 +74,7 @@ function getCustomer(cus_id, APP_ID , PRIV_KEY) {
     return new Promise( function (resolve,reject) {
         let private_key = master_priv_key;
 
-        if(APP_ID == '02_' || APP_ID == '05_' || APP_ID == '04_') { // 3 shops project
+        if(APP_ID == '07_' || APP_ID == '08_') { // 3 shops project
             private_key = PRIV_KEY;
         }
         else if (APP_ID != '') {
@@ -102,7 +102,7 @@ function addCard(cus_id, card_token, APP_ID , PRIV_KEY) {
     return new Promise( function (resolve,reject) {
         let private_key = master_priv_key;
 
-        if(APP_ID == '02_' || APP_ID == '05_' || APP_ID == '04_') { // 3 shops project
+        if(APP_ID == '07_' || APP_ID == '08_') { // 3 shops project
             private_key = PRIV_KEY;
         }
         else if (APP_ID != '') {
@@ -125,7 +125,7 @@ function deleteCard(cus_id, card_id, APP_ID , PRIV_KEY) {
     return new Promise( function (resolve,reject) {
         let private_key = master_priv_key;
 
-        if(APP_ID == '02_' || APP_ID == '05_' || APP_ID == '04_') { // 3 shops project
+        if(APP_ID == '07_' || APP_ID == '08_') { // 3 shops project
             private_key = PRIV_KEY;
         }
         else if (APP_ID != '') {
@@ -154,7 +154,7 @@ function listCards(cus_id, APP_ID , PRIV_KEY) {
     return new Promise( function (resolve,reject) {
         let private_key = master_priv_key;
 
-        if(APP_ID == '02_' || APP_ID == '05_' || APP_ID == '04_') { // 3 shops project
+        if(APP_ID == '07_' || APP_ID == '08_') { // 3 shops project
             private_key = PRIV_KEY;
         }
         else if (APP_ID != '') {
